@@ -4,13 +4,18 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import React, {useState} from 'react';
 import MainContainer from '../style/containers/MainContainer';
 import {containerShadow} from '../style/variables';
 import BasicContainer from '../style/containers/BasicContainer';
 import CustomText from '../style/text/CustomText';
+import {BlurView} from '@react-native-community/blur';
 import Lottie from 'lottie-react-native';
+import OptionButtons from '../components/Home/OptionButtons';
+
 const Home = () => {
   const exercises = [
     {
@@ -25,7 +30,7 @@ const Home = () => {
     },
     {
       img: require('../../assets/biceps.png'),
-      title: 'Uginanie hantli w siadzie na ławce prostej',
+      title: 'Uginanie ramion z hantlami w siadzie na ławce prostej',
       desc: 'Biceps',
     },
     {
@@ -33,10 +38,47 @@ const Home = () => {
       title: 'Wyciskanie sztangi na ławce prostej',
       desc: 'Klatka piersiowa',
     },
+    {
+      img: require('../../assets/legs.png'),
+      title: 'Przysiady klasyczne',
+      desc: 'Nogi',
+    },
+    {
+      img: require('../../assets/triceps.png'),
+      title: 'Wyciskanie francuskie sztangą łamaną ',
+      desc: 'Triceps',
+    },
+    {
+      img: require('../../assets/triceps.png'),
+      title: 'Prostowanie przedramion przy użyciu uchwytu wyciągu górnego',
+      desc: 'Triceps',
+    },
+    {
+      img: require('../../assets/legs.png'),
+      title: 'Wykroki z hantlami',
+      desc: 'Nogi',
+    },
+    {
+      img: require('../../assets/legs.png'),
+      title: 'Wykroki ze sztangą',
+      desc: 'Nogi',
+    },
+    {
+      img: require('../../assets/chest.png'),
+      title: 'Rozpiętki z hantlami leżąc na ławce prostej',
+      desc: 'Klatka piersiowa',
+    },
+    {
+      img: require('../../assets/back.png'),
+      title: 'Martwy ciąg klasyczny',
+      desc: 'Plecy',
+    },
   ];
   const [text, setText] = useState();
   const [suggestion, setSuggestion] = useState(exercises);
-  console.log(suggestion);
+  const [isVisible, setVisible] = useState({type: 'none', flag: 'false'});
+
+  console.log(isVisible);
 
   const handleTextInput = text => {
     setText(text);
@@ -77,18 +119,19 @@ const Home = () => {
           </TouchableOpacity>
         ) : null}
       </BasicContainer>
-      <OptionsButtons />
+      {isVisible.flag == true ? (
+        <ModificationWindows setVisible={setVisible} type={isVisible.type} />
+      ) : null}
+      <OptionButtons setVisible={setVisible} />
       {suggestion.length > 0 ? (
-        suggestion.map((item, index) => {
-          return (
-            <ExerciseItem
-              key={index}
-              img={item.img}
-              title={item.title}
-              desc={item.desc}
-            />
-          );
-        })
+        <FlatList
+          style={{width: '100%', marginBottom: 90}}
+          data={suggestion}
+          renderItem={({item}) => (
+            <ExerciseItem img={item.img} title={item.title} desc={item.desc} />
+          )}
+          keyExtractor={item => item.title}
+        />
       ) : (
         <Lottie
           source={require('../../assets/animations/robot-not-found.json')}
@@ -101,33 +144,52 @@ const Home = () => {
   );
 };
 
-const OptionsButtons = () => {
-  const optionButtons = [
-    {title: 'Filtruj', img: require('../../assets/funnel.png')},
-    {title: 'Sortuj', img: require('../../assets/sort.png')},
-    {title: 'Stwórz', img: require('../../assets/add.png')},
-  ];
-
+const ModificationWindows = ({setVisible, type}) => {
   return (
-    <View
-      style={{
-        width: '100%',
-        marginTop: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-      }}>
-      {optionButtons.map((item, index) => {
-        return (
-          <TouchableOpacity key={index}>
-            <BasicContainer style={[styles.optionButton, containerShadow]}>
-              <CustomText>{item.title}</CustomText>
-              <Image source={item.img} style={styles.optionButtonIcon} />
-            </BasicContainer>
+    <>
+      <BlurView
+        blurType="light"
+        blurAmount={4}
+        reducedTransparencyFallbackColor="white"
+        style={[
+          {
+            zIndex: 2,
+          },
+          StyleSheet.absoluteFill,
+        ]}></BlurView>
+
+      <View
+        style={{
+          backgroundColor: '#111',
+          zIndex: 2,
+          position: 'absolute',
+          width: 300,
+          height: 300,
+          marginTop: '50%',
+          borderRadius: 50,
+          overflow: 'hidden',
+          padding: 20,
+        }}>
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'space-between',
+
+            flexDirection: 'row',
+          }}>
+          <CustomText style={{fontSize: 20, marginLeft: 90}}>{type}</CustomText>
+          <TouchableOpacity
+            onPress={() => {
+              setVisible(false);
+            }}>
+            <Image
+              source={require('../../assets/close.png')}
+              style={styles.closeWindowsButton}
+            />
           </TouchableOpacity>
-        );
-      })}
-    </View>
+        </View>
+      </View>
+    </>
   );
 };
 
@@ -171,6 +233,6 @@ const styles = StyleSheet.create({
     fontFamily: 'ABeeZee-Regular',
   },
   removeIcon: {marginRight: 10},
-  optionButtonIcon: {marginLeft: 10, width: 20, height: 20},
-  optionButton: {width: 105, height: 35},
+
+  closeWindowsButton: {width: 40, height: 40},
 });
