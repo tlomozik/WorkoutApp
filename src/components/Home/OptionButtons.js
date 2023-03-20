@@ -1,5 +1,4 @@
 import {TouchableOpacity, Image, View, StyleSheet} from 'react-native';
-// import {BasicContainer, CustomText, pallete} from '../../style';
 import BasicContainer from '../../style/containers/BasicContainer';
 import CustomText from '../../style/text/CustomText';
 import {containerShadow} from '../../style/variables';

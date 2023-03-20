@@ -1,20 +1,33 @@
 import {
   StyleSheet,
-  View,
   Image,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   FlatList,
 } from 'react-native';
 import React, {useState} from 'react';
 import MainContainer from '../style/containers/MainContainer';
 import {containerShadow} from '../style/variables';
 import BasicContainer from '../style/containers/BasicContainer';
-import CustomText from '../style/text/CustomText';
-import {BlurView} from '@react-native-community/blur';
+import ModificationWindows from '../components/Home/ModificationWindows';
 import Lottie from 'lottie-react-native';
 import OptionButtons from '../components/Home/OptionButtons';
+import ExerciseItem from '../components/Home/ExerciseItem';
+
+const handleUniqueValues = exercises => {
+  return Object.values(
+    exercises.reduce((acc, exercise) => {
+      if (!acc[exercise.desc]) {
+        acc[exercise.desc] = {
+          value: exercise.desc,
+          label: exercise.desc,
+          image: exercise.img,
+        };
+      }
+      return acc;
+    }, {}),
+  );
+};
 
 const Home = () => {
   const exercises = [
@@ -74,11 +87,10 @@ const Home = () => {
       desc: 'Plecy',
     },
   ];
+
   const [text, setText] = useState();
   const [suggestion, setSuggestion] = useState(exercises);
   const [isVisible, setVisible] = useState({type: 'none', flag: 'false'});
-
-  console.log(isVisible);
 
   const handleTextInput = text => {
     setText(text);
@@ -119,10 +131,17 @@ const Home = () => {
           </TouchableOpacity>
         ) : null}
       </BasicContainer>
+
       {isVisible.flag == true ? (
-        <ModificationWindows setVisible={setVisible} type={isVisible.type} />
+        <ModificationWindows
+          setVisible={setVisible}
+          type={isVisible.type}
+          exercises={handleUniqueValues(exercises)}
+        />
       ) : null}
+
       <OptionButtons setVisible={setVisible} />
+
       {suggestion.length > 0 ? (
         <FlatList
           style={{width: '100%', marginBottom: 90}}
@@ -141,82 +160,6 @@ const Home = () => {
         />
       )}
     </MainContainer>
-  );
-};
-
-const ModificationWindows = ({setVisible, type}) => {
-  return (
-    <>
-      <BlurView
-        blurType="light"
-        blurAmount={4}
-        reducedTransparencyFallbackColor="white"
-        style={[
-          {
-            zIndex: 2,
-          },
-          StyleSheet.absoluteFill,
-        ]}></BlurView>
-
-      <View
-        style={{
-          backgroundColor: '#111',
-          zIndex: 2,
-          position: 'absolute',
-          width: 300,
-          height: 300,
-          marginTop: '50%',
-          borderRadius: 50,
-          overflow: 'hidden',
-          padding: 20,
-        }}>
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'space-between',
-
-            flexDirection: 'row',
-          }}>
-          <CustomText style={{fontSize: 20, marginLeft: 90}}>{type}</CustomText>
-          <TouchableOpacity
-            onPress={() => {
-              setVisible(false);
-            }}>
-            <Image
-              source={require('../../assets/close.png')}
-              style={styles.closeWindowsButton}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </>
-  );
-};
-
-const ExerciseItem = ({img, title, desc}) => {
-  return (
-    <TouchableOpacity>
-      <View
-        style={{
-          width: '100%',
-          height: 50,
-          marginTop: 15,
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 5,
-        }}>
-        <Image source={img} style={{width: 40, height: 40}} />
-        <View
-          style={{
-            marginLeft: 10,
-            flex: 1,
-            flexDirection: 'column',
-          }}>
-          <CustomText style={{fontSize: 14}}>{title}</CustomText>
-          <CustomText style={{fontSize: 13}}>{desc}</CustomText>
-        </View>
-      </View>
-    </TouchableOpacity>
   );
 };
 
