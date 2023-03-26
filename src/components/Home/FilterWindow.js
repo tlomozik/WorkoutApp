@@ -1,14 +1,24 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {BlurView} from '@react-native-community/blur';
 import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import CustomText from '../../style/text/CustomText';
 import {pallete} from '../../style/index';
 import {SelectCountry} from 'react-native-element-dropdown';
-const ModificationWindows = ({setVisible, type, exercises}) => {
+import {Context} from '../../screens/HomeScreen';
+
+const FilterWindow = ({setVisible, type, exercises}) => {
   const [exercise, setExercise] = useState(null);
-  const [sortTerms, setSortTerms] = useState([]);
+  const [sortTerms, setSortTerms] = useContext(Context);
   const [isDisable, setIsDisable] = useState(false);
-  console.log(sortTerms);
+
+  const handleSortItemRemoval = index => {
+    const newTerms = [...sortTerms];
+    newTerms.splice(index, 1);
+    if (!newTerms.some(item => item.title)) {
+      setIsDisable(false);
+    }
+    setSortTerms(newTerms);
+  };
 
   return (
     <>
@@ -79,11 +89,8 @@ const ModificationWindows = ({setVisible, type, exercises}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  const newTerm = 'A-Z';
-                  if (
-                    !sortTerms.includes(newTerm) & !sortTerms.includes('Z-A')
-                  ) {
-                    setSortTerms([...sortTerms, 'A-Z']);
+                  if (!sortTerms.some(term => term.order)) {
+                    setSortTerms([...sortTerms, {order: 'A-Z'}]);
                   }
                 }}>
                 <Image
@@ -93,11 +100,8 @@ const ModificationWindows = ({setVisible, type, exercises}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  const newTerm = 'Z-A';
-                  if (
-                    !sortTerms.includes(newTerm) & !sortTerms.includes('A-Z')
-                  ) {
-                    setSortTerms([...sortTerms, 'Z-A']);
+                  if (!sortTerms.some(term => term.order)) {
+                    setSortTerms([...sortTerms, {order: 'Z-A'}]);
                   }
                 }}>
                 <Image
@@ -108,9 +112,8 @@ const ModificationWindows = ({setVisible, type, exercises}) => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                const newTerm = 'Data';
-                if (!sortTerms.includes(newTerm)) {
-                  setSortTerms([...sortTerms, 'Data']);
+                if (!sortTerms.some(term => term.date)) {
+                  setSortTerms([...sortTerms, {date: 'Data'}]);
                 }
               }}>
               <View
@@ -135,8 +138,15 @@ const ModificationWindows = ({setVisible, type, exercises}) => {
               //justifyContent: 'space-evenly',
               padding: 5,
             }}>
-            {sortTerms.map((item, index) => {
-              return <SortItem key={index} terms={item} />;
+            {sortTerms.map((item, index, array) => {
+              return (
+                <SortItem
+                  key={index}
+                  index={index}
+                  term={item}
+                  onRemove={handleSortItemRemoval}
+                />
+              );
             })}
           </View>
           <View
@@ -161,62 +171,88 @@ const ModificationWindows = ({setVisible, type, exercises}) => {
               imageField="image"
               placeholder="Wybierz ćwiczenie"
               onChange={e => {
-                setExercise(e.value),
-                  setSortTerms([...sortTerms, e.value]),
+                if (
+                  !sortTerms.some(term => {
+                    term.title;
+                  })
+                ) {
+                  setExercise(e.value),
+                    setSortTerms([...sortTerms, {title: e.value}]);
                   setIsDisable(true);
+                }
               }}
             />
           </View>
         </View>
         {sortTerms.length > 0 ? (
-          <TouchableOpacity
-            onPress={() => {
-              setSortTerms([]), setIsDisable(false);
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-around',
             }}>
-            <View
-              style={{
-                backgroundColor: pallete.bgColor,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 30,
-                width: '50%',
-                alignSelf: 'center',
-                borderRadius: 20,
+            <TouchableOpacity
+              onPress={() => {
+                setSortTerms([]);
               }}>
-              <CustomText>Usuń filtry</CustomText>
-            </View>
-          </TouchableOpacity>
-        ) : null}
+              <View style={styles.deleteAcceptButton}>
+                <CustomText>Usuń</CustomText>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setVisible(false);
+              }}>
+              <View style={styles.deleteAcceptButton}>
+                <CustomText>Zatwierdź</CustomText>
+              </View>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={{height: 30}}></View>
+        )}
       </View>
     </>
   );
 };
 
-const SortItem = ({terms}) => {
-  const [isVisible, setIsVisible] = useState(true);
-
+const SortItem = ({index, term, onRemove}) => {
   return (
     <>
-      {isVisible ? (
-        <View
-          style={{
-            marginLeft: 5,
-            borderWidth: 1,
-            borderRadius: 5,
-            borderColor: pallete.headerColor,
-            width: '30%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 35,
+      <View
+        style={{
+          marginLeft: 5,
+          borderWidth: 1,
+          borderRadius: 5,
+          borderColor: pallete.headerColor,
+          width: '30%',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          height: 35,
+          flexDirection: 'row',
+        }}>
+        <CustomText>
+          {term.title ? term.title : null}
+          {term.order ? term.order : null}
+          {term.date ? term.date : null}
+        </CustomText>
+        <TouchableOpacity
+          onPress={() => {
+            {
+              onRemove(index);
+            }
           }}>
-          <CustomText>{terms}</CustomText>
-        </View>
-      ) : null}
+          <Image
+            source={require('../../../assets/close2.png')}
+            style={{width: 17, height: 17}}
+          />
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
 
-export default ModificationWindows;
+export default FilterWindow;
 
 const styles = StyleSheet.create({
   closeWindowsButton: {width: 40, height: 40},
@@ -251,5 +287,15 @@ const styles = StyleSheet.create({
   iconStyle: {
     width: 20,
     height: 20,
+  },
+
+  deleteAcceptButton: {
+    backgroundColor: pallete.bgColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 30,
+    width: 100,
+    alignSelf: 'center',
+    borderRadius: 20,
   },
 });
