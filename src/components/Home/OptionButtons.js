@@ -7,7 +7,7 @@ import React from 'react';
 const OptionButtons = ({setVisible}) => {
   const options = [
     {title: 'Filtruj', img: require('../../../assets/funnel.png')},
-    {title: 'Sortuj', img: require('../../../assets/sort.png')},
+    // {title: 'Sortuj', img: require('../../../assets/sort.png')},
     {title: 'Stwórz', img: require('../../../assets/add.png')},
   ];
 
@@ -17,7 +17,8 @@ const OptionButtons = ({setVisible}) => {
         width: '100%',
         marginTop: 10,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        //backgroundColor: 'red',
+        // justifyContent: 'space-evenly',
         marginBottom: 20,
       }}>
       {options.map((item, index) => {
@@ -49,5 +50,5 @@ export default OptionButtons;
 
 const styles = StyleSheet.create({
   optionButtonIcon: {marginLeft: 10, width: 20, height: 20},
-  optionButton: {width: 105, height: 35},
+  optionButton: {width: 105, height: 35, marginLeft: 10},
 });

@@ -13,6 +13,7 @@ import FilterWindow from '../components/Home/FilterWindow';
 import Lottie from 'lottie-react-native';
 import OptionButtons from '../components/Home/OptionButtons';
 import ExerciseItem from '../components/Home/ExerciseItem';
+import CreateExWindow from '../components/Home/CreateExWindow';
 
 export const Context = React.createContext();
 
@@ -23,7 +24,7 @@ const handleUniqueValues = exercises => {
         acc[exercise.desc] = {
           value: exercise.desc,
           label: exercise.desc,
-          image: exercise.img,
+          image: exercise.img || require('../../assets/question-mark.png'),
         };
       }
       return acc;
@@ -42,15 +43,12 @@ const exercises = [
     desc: 'Biceps',
   },
   {
-    img: require('../../assets/biceps.png'),
-    title: 'B',
-    desc: 'Test',
+    //    img: require('../../assets/biceps.png'),
+
+    title: 'Wyciskanie żołnierskie sztangi',
+    desc: 'Barki',
   },
-  {
-    img: require('../../assets/biceps.png'),
-    title: 'A',
-    desc: 'Test2',
-  },
+
   {
     img: require('../../assets/back.png'),
     title: 'Ściąganie drążka nachwytem',
@@ -76,11 +74,7 @@ const exercises = [
     title: 'Wyciskanie francuskie sztangą łamaną ',
     desc: 'Triceps',
   },
-  {
-    img: require('../../assets/biceps.png'),
-    title: 'Z',
-    desc: 'TestZ',
-  },
+
   {
     img: require('../../assets/triceps.png'),
     title: 'Prostowanie przedramion przy użyciu uchwytu wyciągu górnego',
@@ -96,6 +90,7 @@ const exercises = [
     title: 'Wykroki ze sztangą',
     desc: 'Nogi',
   },
+
   {
     img: require('../../assets/chest.png'),
     title: 'Rozpiętki z hantlami leżąc na ławce prostej',
@@ -113,6 +108,8 @@ const Home = () => {
   const [text, setText] = useState();
   const [suggestion, setSuggestion] = useState(exercises);
   const [isVisible, setVisible] = useState({type: 'none', flag: 'false'});
+
+  console.log(isVisible);
 
   const handleTextInput = text => {
     setText(text);
@@ -204,6 +201,14 @@ const Home = () => {
           />
         ) : null}
 
+        {(isVisible.flag == true) & (isVisible.type == 'Stwórz') ? (
+          <CreateExWindow
+            setVisible={setVisible}
+            type={isVisible.type}
+            exercises={handleUniqueValues(exercises)}
+          />
+        ) : null}
+
         <OptionButtons setVisible={setVisible} />
 
         {suggestion.length > 0 ? (
@@ -212,7 +217,7 @@ const Home = () => {
             data={suggestion}
             renderItem={({item}) => (
               <ExerciseItem
-                img={item.img}
+                img={item.img || require('../../assets/question-mark.png')}
                 title={item.title}
                 desc={item.desc}
               />

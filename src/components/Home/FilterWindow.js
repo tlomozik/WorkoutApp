@@ -50,7 +50,7 @@ const FilterWindow = ({setVisible, type, exercises}) => {
           style={{
             alignItems: 'center',
             justifyContent: 'space-between',
-            //       backgroundColor: 'red',
+            //     backgroundColor: 'red',
             flexDirection: 'row',
           }}>
           <CustomText style={{fontSize: 20, marginLeft: 90}}>{type}</CustomText>
@@ -151,7 +151,7 @@ const FilterWindow = ({setVisible, type, exercises}) => {
           </View>
           <View
             style={{
-              //          backgroundColor: 'yellow',
+              //    backgroundColor: 'yellow',
               alignItems: 'center',
             }}>
             <SelectCountry
@@ -169,7 +169,7 @@ const FilterWindow = ({setVisible, type, exercises}) => {
               valueField="value"
               labelField="label"
               imageField="image"
-              placeholder="Wybierz ćwiczenie"
+              placeholder="Wybierz partię mięśniową"
               onChange={e => {
                 if (
                   !sortTerms.some(term => {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 50,
-    width: 200,
+    width: 225,
     backgroundColor: pallete.headerColor,
     borderRadius: 22,
     paddingHorizontal: 8,
