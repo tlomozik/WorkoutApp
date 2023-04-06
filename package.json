@@ -22,6 +22,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-native": "^4.0.0",
     "eslint-plugin-styled-components-a11y": "^0.1.0",
+    "firebase": "^9.19.1",
     "lottie-react-native": "^5.1.5",
     "react": "~17.0.2",
     "react-native": "~0.68.2",

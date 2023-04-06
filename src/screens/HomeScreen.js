@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import MainContainer from '../style/containers/MainContainer';
 import {containerShadow} from '../style/variables';
 import BasicContainer from '../style/containers/BasicContainer';
@@ -14,6 +14,7 @@ import Lottie from 'lottie-react-native';
 import OptionButtons from '../components/Home/OptionButtons';
 import ExerciseItem from '../components/Home/ExerciseItem';
 import CreateExWindow from '../components/Home/CreateExWindow';
+import getExercises from '../services/getExercises';
 
 export const Context = React.createContext();
 
@@ -36,86 +37,87 @@ const handleUniqueValues = exercises => {
   // );
 };
 
-const exercises = [
-  {
-    img: require('../../assets/biceps.png'),
-    title: 'Uginanie ramion ze sztangą łamaną',
-    desc: 'Biceps',
-  },
-  {
-    //    img: require('../../assets/biceps.png'),
+// const exercises = [
+//   {
+//     img: require('../../assets/biceps.png'),
+//     title: 'Uginanie ramion ze sztangą łamaną',
+//     desc: 'Biceps',
+//   },
+//   {
+//     //    img: require('../../assets/biceps.png'),
 
-    title: 'Wyciskanie żołnierskie sztangi',
-    desc: 'Barki',
-  },
+//     title: 'Wyciskanie żołnierskie sztangi',
+//     desc: 'Barki',
+//   },
 
-  {
-    img: require('../../assets/back.png'),
-    title: 'Ściąganie drążka nachwytem',
-    desc: 'Plecy',
-  },
-  {
-    img: require('../../assets/biceps.png'),
-    title: 'Uginanie ramion z hantlami w siadzie na ławce prostej',
-    desc: 'Biceps',
-  },
-  {
-    img: require('../../assets/chest.png'),
-    title: 'Wyciskanie sztangi na ławce prostej',
-    desc: 'Klatka piersiowa',
-  },
-  {
-    img: require('../../assets/legs.png'),
-    title: 'Przysiady klasyczne',
-    desc: 'Nogi',
-  },
-  {
-    img: require('../../assets/triceps.png'),
-    title: 'Wyciskanie francuskie sztangą łamaną ',
-    desc: 'Triceps',
-  },
+//   {
+//     img: require('../../assets/back.png'),
+//     title: 'Ściąganie drążka nachwytem',
+//     desc: 'Plecy',
+//   },
+//   {
+//     img: require('../../assets/biceps.png'),
+//     title: 'Uginanie ramion z hantlami w siadzie na ławce prostej',
+//     desc: 'Biceps',
+//   },
+//   {
+//     img: require('../../assets/chest.png'),
+//     title: 'Wyciskanie sztangi na ławce prostej',
+//     desc: 'Klatka piersiowa',
+//   },
+//   {
+//     img: require('../../assets/legs.png'),
+//     title: 'Przysiady klasyczne',
+//     desc: 'Nogi',
+//   },
+//   {
+//     img: require('../../assets/triceps.png'),
+//     title: 'Wyciskanie francuskie sztangą łamaną ',
+//     desc: 'Triceps',
+//   },
 
-  {
-    img: require('../../assets/triceps.png'),
-    title: 'Prostowanie przedramion przy użyciu uchwytu wyciągu górnego',
-    desc: 'Triceps',
-  },
-  {
-    img: require('../../assets/legs.png'),
-    title: 'Wykroki z hantlami',
-    desc: 'Nogi',
-  },
-  {
-    img: require('../../assets/legs.png'),
-    title: 'Wykroki ze sztangą',
-    desc: 'Nogi',
-  },
+//   {
+//     img: require('../../assets/triceps.png'),
+//     title: 'Prostowanie przedramion przy użyciu uchwytu wyciągu górnego',
+//     desc: 'Triceps',
+//   },
+//   {
+//     img: require('../../assets/legs.png'),
+//     title: 'Wykroki z hantlami',
+//     desc: 'Nogi',
+//   },
+//   {
+//     img: require('../../assets/legs.png'),
+//     title: 'Wykroki ze sztangą',
+//     desc: 'Nogi',
+//   },
 
-  {
-    img: require('../../assets/chest.png'),
-    title: 'Rozpiętki z hantlami leżąc na ławce prostej',
-    desc: 'Klatka piersiowa',
-  },
-  {
-    img: require('../../assets/back.png'),
-    title: 'Martwy ciąg klasyczny',
-    desc: 'Plecy',
-  },
-];
+//   {
+//     img: require('../../assets/chest.png'),
+//     title: 'Rozpiętki z hantlami leżąc na ławce prostej',
+//     desc: 'Klatka piersiowa',
+//   },
+//   {
+//     img: require('../../assets/back.png'),
+//     title: 'Martwy ciąg klasyczny',
+//     desc: 'Plecy',
+//   },
+// ];
 
 const Home = () => {
   const [sortTerms, setSortTerms] = useState([]);
   const [text, setText] = useState();
-  const [suggestion, setSuggestion] = useState(exercises);
+  const [exercises, setExercises] = useState();
+  const [suggestion, setSuggestion] = useState();
   const [isVisible, setVisible] = useState({type: 'none', flag: 'false'});
 
-  console.log(isVisible);
+  const initialExercises = useRef([]);
 
   const handleTextInput = text => {
     setText(text);
 
-    setSuggestion(
-      exercises.filter(
+    setExercises(
+      initialExercises.current.filter(
         item =>
           item.title.toLowerCase().includes(text.toLowerCase().trim()) |
           item.desc.toLowerCase().includes(text.toLowerCase().trim()),
@@ -124,34 +126,36 @@ const Home = () => {
   };
 
   const handleSorting = useCallback(() => {
-    let filteredExercises = suggestion;
+    // let filteredExercises = exercises;
 
     if (sortTerms.some(term => term.order)) {
       sortTerms.forEach(term => {
         if (term.order === 'A-Z') {
-          filteredExercises.sort((a, b) =>
-            a.title.localeCompare(b.title, 'pl'),
+          setExercises(
+            exercises.sort((a, b) => a.title.localeCompare(b.title, 'pl')),
           );
         } else if (term.order === 'Z-A') {
-          filteredExercises.sort((a, b) =>
-            b.title.localeCompare(a.title, 'pl'),
+          setExercises(
+            exercises.sort((a, b) => b.title.localeCompare(a.title, 'pl')),
           );
         }
       });
     }
 
     if (sortTerms.some(term => term.title)) {
-      filteredExercises = suggestion.filter(exercise => {
-        return sortTerms.some(term => {
-          if (term.title === exercise.desc) {
-            return true;
-          }
-          return false;
-        });
-      });
+      setExercises(
+        exercises.filter(exercise => {
+          return sortTerms.some(term => {
+            if (term.title === exercise.desc) {
+              return true;
+            }
+            return false;
+          });
+        }),
+      );
     }
 
-    setSuggestion(filteredExercises);
+    //setExercises(filteredExercises);
   }, [sortTerms]);
 
   useEffect(() => {
@@ -160,9 +164,29 @@ const Home = () => {
     }
 
     return () => {
-      setSuggestion(exercises);
+      setExercises(initialExercises.current);
     };
   }, [handleSorting]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getExercises();
+
+      initialExercises.current = response;
+      setExercises(response);
+    };
+    if (initialExercises.current != null) {
+      fetchData();
+    }
+
+    // console.log(initialExercises);
+
+    return () => {
+      //  initialExercises.current = null;
+    };
+  }, []);
+
+  console.log(initialExercises.current);
 
   return (
     <Context.Provider value={[sortTerms, setSortTerms]}>
@@ -183,7 +207,7 @@ const Home = () => {
           {text ? (
             <TouchableOpacity
               onPress={() => {
-                setText(null), setSuggestion(exercises);
+                setText(null), setExercises(initialExercises.current);
               }}>
               <Image
                 source={require('../../assets/remove.png')}
@@ -210,8 +234,28 @@ const Home = () => {
         ) : null}
 
         <OptionButtons setVisible={setVisible} />
-
-        {suggestion.length > 0 ? (
+        {exercises ? (
+          <FlatList
+            style={{width: '100%', marginBottom: 90}}
+            data={exercises}
+            renderItem={({item}) => (
+              <ExerciseItem
+                img={item.img || require('../../assets/question-mark.png')}
+                title={item.title}
+                desc={item.desc}
+              />
+            )}
+            keyExtractor={item => item.title}
+          />
+        ) : (
+          <Lottie
+            source={require('../../assets/animations/robot-not-found.json')}
+            autoPlay
+            style={{width: 200, height: 'auto', marginTop: '5%'}}
+            loop
+          />
+        )}
+        {/* {suggestion.length > 0 ? (
           <FlatList
             style={{width: '100%', marginBottom: 90}}
             data={suggestion}
@@ -231,7 +275,7 @@ const Home = () => {
             style={{width: 200, height: 'auto', marginTop: '5%'}}
             loop
           />
-        )}
+        )} */}
       </MainContainer>
     </Context.Provider>
   );

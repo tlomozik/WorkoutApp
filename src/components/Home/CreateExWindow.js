@@ -12,7 +12,7 @@ import CustomText from '../../style/text/CustomText';
 import {SelectCountry} from 'react-native-element-dropdown';
 import {pallete} from '../../style/index';
 import {launchImageLibrary} from 'react-native-image-picker';
-
+import addExercise from '../../services/addExercise';
 const CreateExWindows = ({setVisible, type, exercises}) => {
   const [isDisable, setIsDisable] = useState(false);
   const [exercise, setExercise] = useState(null);
@@ -27,13 +27,14 @@ const CreateExWindows = ({setVisible, type, exercises}) => {
 
     launchImageLibrary(options, response => {
       if (response.didCancel != true) {
-        setImage(response.assets[0].uri);
+        console.log(response);
+
+        setImage({
+          fileName: response.assets[0].fileName,
+          uri: response.assets[0].uri,
+        });
       }
     });
-  };
-
-  const handleExcerciseCreation = () => {
-    console.log();
   };
 
   return (
@@ -97,12 +98,17 @@ const CreateExWindows = ({setVisible, type, exercises}) => {
             </TouchableOpacity>
             {image ? (
               <View style={styles.iconContainer}>
-                <Image source={{uri: image}} style={{width: 30, height: 30}} />
+                <Image
+                  source={{uri: image.uri}}
+                  style={{width: 30, height: 30}}
+                />
               </View>
             ) : null}
           </View>
           <TouchableOpacity
-            onPress={handleExcerciseCreation}
+            onPress={() => {
+              addExercise(exercise, category, image.fileName);
+            }}
             style={styles.createButton}>
             <CustomText>Utwórz</CustomText>
           </TouchableOpacity>
