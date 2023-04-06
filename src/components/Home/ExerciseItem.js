@@ -13,7 +13,7 @@ const ExerciseItem = ({img, title, desc}) => {
           alignItems: 'center',
           padding: 5,
         }}>
-        <Image source={img} style={{width: 40, height: 40}} />
+        <Image source={{uri: img}} style={{width: 40, height: 40}} />
         <View
           style={{
             marginLeft: 10,

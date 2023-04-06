@@ -1,35 +1,22 @@
 import {collection, getDocs} from 'firebase/firestore';
 import {db, storage} from '../firebase/firebase';
 import {ref, getDownloadURL} from 'firebase/storage';
+import {useState} from 'react';
+
 export default async () => {
-  let exercises = [];
-  let image = null;
   try {
     const querySnapshot = await getDocs(collection(db, 'exercises'));
+    const storageRef = ref(storage, 'test');
 
-    getDownloadURL(ref(storage, 'Brzuch')).then(url => {
-      image = url;
-    });
-    querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      exercises.push(doc.data());
-      // console.log(doc.data());
+    const url = await getDownloadURL(storageRef);
 
-      // console.log(
-      //   exercises.map(item => {
-      //     return {desc: item.desc, title: item.title, img: 'Siemka'};
-      //   }),
-      // );
+    const exercises = querySnapshot.docs.map(doc => ({
+      ...doc.data(),
+      img: url,
+    }));
 
-      //  console.log(doc.id, ' => ', doc.data());
-      //   })
-
-      // .catch(error => {
-      //   // obsługa błędów
-    });
+    return {exercises};
   } catch (error) {
     console.log(error);
   }
-
-  return exercises;
 };

@@ -13,11 +13,16 @@ import {SelectCountry} from 'react-native-element-dropdown';
 import {pallete} from '../../style/index';
 import {launchImageLibrary} from 'react-native-image-picker';
 import addExercise from '../../services/addExercise';
+
 const CreateExWindows = ({setVisible, type, exercises}) => {
   const [isDisable, setIsDisable] = useState(false);
   const [exercise, setExercise] = useState(null);
   const [category, setCategory] = useState(null);
   const [image, setImage] = useState(null);
+
+  let formattedArray = exercises.map(item => {
+    return {label: item.label, value: item.value, image: {uri: item.image}};
+  });
 
   const pickImage = () => {
     const options = {
@@ -27,10 +32,12 @@ const CreateExWindows = ({setVisible, type, exercises}) => {
 
     launchImageLibrary(options, response => {
       if (response.didCancel != true) {
-        console.log(response);
+        //   console.log(response);
 
         setImage({
-          fileName: response.assets[0].fileName,
+          //fileName: response.assets[0].uri,
+          //  fileName: response.assets[0].fileName,
+
           uri: response.assets[0].uri,
         });
       }
@@ -74,7 +81,7 @@ const CreateExWindows = ({setVisible, type, exercises}) => {
               maxHeight={200}
               disable={isDisable}
               value={category}
-              data={exercises}
+              data={formattedArray}
               valueField="value"
               labelField="label"
               imageField="image"
@@ -107,7 +114,7 @@ const CreateExWindows = ({setVisible, type, exercises}) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              addExercise(exercise, category, image.fileName);
+              addExercise(exercise, category, image.uri);
             }}
             style={styles.createButton}>
             <CustomText>Utwórz</CustomText>

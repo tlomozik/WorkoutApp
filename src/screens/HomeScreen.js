@@ -108,7 +108,7 @@ const Home = () => {
   const [sortTerms, setSortTerms] = useState([]);
   const [text, setText] = useState();
   const [exercises, setExercises] = useState();
-  const [suggestion, setSuggestion] = useState();
+  //  const [suggestion, setSuggestion] = useState();
   const [isVisible, setVisible] = useState({type: 'none', flag: 'false'});
 
   const initialExercises = useRef([]);
@@ -172,8 +172,8 @@ const Home = () => {
     const fetchData = async () => {
       const response = await getExercises();
 
-      initialExercises.current = response;
-      setExercises(response);
+      initialExercises.current = response.exercises;
+      setExercises(response.exercises);
     };
     if (initialExercises.current != null) {
       fetchData();
@@ -186,7 +186,7 @@ const Home = () => {
     };
   }, []);
 
-  console.log(initialExercises.current);
+  //  console.log(initialExercises.current);
 
   return (
     <Context.Provider value={[sortTerms, setSortTerms]}>
@@ -229,7 +229,7 @@ const Home = () => {
           <CreateExWindow
             setVisible={setVisible}
             type={isVisible.type}
-            exercises={handleUniqueValues(exercises)}
+            exercises={handleUniqueValues(initialExercises.current)}
           />
         ) : null}
 
@@ -255,27 +255,6 @@ const Home = () => {
             loop
           />
         )}
-        {/* {suggestion.length > 0 ? (
-          <FlatList
-            style={{width: '100%', marginBottom: 90}}
-            data={suggestion}
-            renderItem={({item}) => (
-              <ExerciseItem
-                img={item.img || require('../../assets/question-mark.png')}
-                title={item.title}
-                desc={item.desc}
-              />
-            )}
-            keyExtractor={item => item.title}
-          />
-        ) : (
-          <Lottie
-            source={require('../../assets/animations/robot-not-found.json')}
-            autoPlay
-            style={{width: 200, height: 'auto', marginTop: '5%'}}
-            loop
-          />
-        )} */}
       </MainContainer>
     </Context.Provider>
   );
